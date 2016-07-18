@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestLk(t *testing.T) {
+func TestLK(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Lk Suite")
 }

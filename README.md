@@ -1,7 +1,7 @@
 # license-key
 
 [![Build Status](https://travis-ci.org/hyperboloide/license-key.svg?branch=master)](https://travis-ci.org/hyperboloide/license-key)
-[![GoDoc](https://godoc.org/github.com/hyperboloide/qmail?status.svg)](https://godoc.org/github.com/hyperboloide/license-key)
+[![GoDoc](https://godoc.org/github.com/hyperboloide/qmail?status.svg)](https://godoc.org/github.com/hyperboloide/license-key/lk)
 
 A simple licensing library in Golang, that generates license files
 containing arbitrary data.

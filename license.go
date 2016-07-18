@@ -14,11 +14,21 @@ type License struct {
 	S    *big.Int
 }
 
-// NewLicense create a new license. Make sure to sign it before use.
-func NewLicense(data []byte) *License {
-	return &License{
+// NewLicense create a new license and sign it.
+func NewLicense(k *PrivateKey, data []byte) (*License, error) {
+	l := &License{
 		Data: data,
 	}
+
+	if h, err := l.hash(); err != nil {
+		return nil, err
+	} else if r, s, err := ecdsa.Sign(rand.Reader, k.toEcdsa(), h); err != nil {
+		return nil, err
+	} else {
+		l.R = r
+		l.S = s
+	}
+	return l, nil
 }
 
 func (l *License) hash() ([]byte, error) {
@@ -28,23 +38,6 @@ func (l *License) hash() ([]byte, error) {
 		return nil, err
 	}
 	return h256.Sum(nil), nil
-}
-
-// Sign signs a License with a PrivateKey.
-func (l *License) Sign(k *PrivateKey) error {
-	h, err := l.hash()
-	if err != nil {
-		return err
-	}
-
-	r, s, err := ecdsa.Sign(rand.Reader, k.toEcdsa(), h)
-	if err != nil {
-		return err
-	}
-
-	l.R = r
-	l.S = s
-	return nil
 }
 
 // Verify the Lisence with the public key

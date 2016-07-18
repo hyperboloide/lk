@@ -3,8 +3,6 @@ package lk
 import (
 	"crypto/rand"
 
-	// . "github.com/hyperboloide/license-key/lk"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
