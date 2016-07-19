@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/base32"
 	"encoding/base64"
 	"errors"
 	"math/big"
@@ -60,6 +61,15 @@ func (k PrivateKey) ToB64String() (string, error) {
 	return base64.StdEncoding.EncodeToString(b), nil
 }
 
+// ToB32String transforms the private key to a base64 string.
+func (k PrivateKey) ToB32String() (string, error) {
+	b, err := k.ToBytes()
+	if err != nil {
+		return "", err
+	}
+	return base32.StdEncoding.EncodeToString(b), nil
+}
+
 // PrivateKeyFromBytes returns a private key from a []byte.
 func PrivateKeyFromBytes(b []byte) (*PrivateKey, error) {
 	c := &pkContainer{}
@@ -82,6 +92,16 @@ func PrivateKeyFromBytes(b []byte) (*PrivateKey, error) {
 // string.
 func PrivateKeyFromB64String(str string) (*PrivateKey, error) {
 	b, err := base64.StdEncoding.DecodeString(str)
+	if err != nil {
+		return nil, err
+	}
+	return PrivateKeyFromBytes(b)
+}
+
+// PrivateKeyFromB32String returns a private key from a base64 encoded
+// string.
+func PrivateKeyFromB32String(str string) (*PrivateKey, error) {
+	b, err := base32.StdEncoding.DecodeString(str)
 	if err != nil {
 		return nil, err
 	}
@@ -117,6 +137,13 @@ func (k PublicKey) ToB64String() string {
 	)
 }
 
+// ToB32String transforms the public key to a base64 string.
+func (k PublicKey) ToB32String() string {
+	return base32.StdEncoding.EncodeToString(
+		k.ToBytes(),
+	)
+}
+
 // PublicKeyFromBytes returns a public key from a []byte.
 func PublicKeyFromBytes(b []byte) (*PublicKey, error) {
 	x, y := elliptic.Unmarshal(Curve(), b)
@@ -137,6 +164,17 @@ func PublicKeyFromBytes(b []byte) (*PublicKey, error) {
 // string.
 func PublicKeyFromB64String(str string) (*PublicKey, error) {
 	b, err := base64.StdEncoding.DecodeString(str)
+	if err != nil {
+		return nil, err
+	}
+
+	return PublicKeyFromBytes(b)
+}
+
+// PublicKeyFromB32String returns a private key from a base64 encoded
+// string.
+func PublicKeyFromB32String(str string) (*PublicKey, error) {
+	b, err := base32.StdEncoding.DecodeString(str)
 	if err != nil {
 		return nil, err
 	}

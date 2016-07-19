@@ -7,8 +7,7 @@ import (
 
 var _ = Describe("Keys", func() {
 
-	It("should test private key", func() {
-
+	It("should test private key bytes", func() {
 		k, err := NewPrivateKey()
 		Ω(err).To(BeNil())
 
@@ -17,16 +16,31 @@ var _ = Describe("Keys", func() {
 		k1, err := PrivateKeyFromBytes(b)
 		Ω(err).To(BeNil())
 		Ω(k1).To(Equal(k))
-
-		s, err := k.ToB64String()
-		Ω(err).To(BeNil())
-		k2, err := PrivateKeyFromB64String(s)
-		Ω(err).To(BeNil())
-		Ω(k2).To(Equal(k))
-
 	})
 
-	It("should test public key", func() {
+	It("should test private key b64", func() {
+		k, err := NewPrivateKey()
+		Ω(err).To(BeNil())
+
+		b, err := k.ToB64String()
+		Ω(err).To(BeNil())
+		k1, err := PrivateKeyFromB64String(b)
+		Ω(err).To(BeNil())
+		Ω(k1).To(Equal(k))
+	})
+
+	It("should test private key b32", func() {
+		k, err := NewPrivateKey()
+		Ω(err).To(BeNil())
+
+		b, err := k.ToB32String()
+		Ω(err).To(BeNil())
+		k1, err := PrivateKeyFromB32String(b)
+		Ω(err).To(BeNil())
+		Ω(k1).To(Equal(k))
+	})
+
+	It("should test pubic key bytes", func() {
 		privK, err := NewPrivateKey()
 		Ω(err).To(BeNil())
 
@@ -37,13 +51,32 @@ var _ = Describe("Keys", func() {
 		k1, err := PublicKeyFromBytes(b)
 		Ω(err).To(BeNil())
 		Ω(k1).To(Equal(k))
+	})
 
-		s := k.ToB64String()
-		Ω(s).ToNot(Equal(""))
-		k2, err := PublicKeyFromB64String(s)
+	It("should test pubic key b64", func() {
+		privK, err := NewPrivateKey()
 		Ω(err).To(BeNil())
-		Ω(k2).To(Equal(k))
 
+		k := privK.GetPublicKey()
+		Ω(k).ToNot(BeNil())
+
+		b := k.ToB64String()
+		k1, err := PublicKeyFromB64String(b)
+		Ω(err).To(BeNil())
+		Ω(k1).To(Equal(k))
+	})
+
+	It("should test pubic key b32", func() {
+		privK, err := NewPrivateKey()
+		Ω(err).To(BeNil())
+
+		k := privK.GetPublicKey()
+		Ω(k).ToNot(BeNil())
+
+		b := k.ToB32String()
+		k1, err := PublicKeyFromB32String(b)
+		Ω(err).To(BeNil())
+		Ω(k1).To(Equal(k))
 	})
 
 })

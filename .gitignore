@@ -22,3 +22,5 @@ _testmain.go
 *.exe
 *.test
 *.prof
+/lkgen/lkgen
+/examples/gen_keys/gen_keys

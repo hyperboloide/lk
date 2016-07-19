@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("License", func() {
 
-	It("should test a license", func() {
+	It("should test a license with bytes", func() {
 
 		k, err := NewPrivateKey()
 		Ω(err).To(BeNil())
@@ -32,18 +32,67 @@ var _ = Describe("License", func() {
 		Ω(ok).To(BeTrue())
 		Ω(bytes.Equal(l.Data, l2.Data)).To(BeTrue())
 
-		str, err := l.ToB64String()
+		k2, err := NewPrivateKey()
 		Ω(err).To(BeNil())
-		l3, err := LicenseFromB64String(str)
+		ok, err = l.Verify(k2.GetPublicKey())
 		Ω(err).To(BeNil())
-		ok, err = l3.Verify(k.GetPublicKey())
+		Ω(ok).To(BeFalse())
+	})
+
+	It("should test a license with b64", func() {
+
+		k, err := NewPrivateKey()
+		Ω(err).To(BeNil())
+
+		b := make([]byte, 100)
+		_, err = rand.Read(b)
+		Ω(err).To(BeNil())
+
+		l, err := NewLicense(k, b)
+		Ω(err).To(BeNil())
+		Ω(l).ToNot(BeNil())
+
+		b2, err := l.ToB64String()
+		Ω(err).To(BeNil())
+		l2, err := LicenseFromB64String(b2)
+		Ω(err).To(BeNil())
+		ok, err := l2.Verify(k.GetPublicKey())
 		Ω(err).To(BeNil())
 		Ω(ok).To(BeTrue())
-		Ω(bytes.Equal(l.Data, l3.Data)).To(BeTrue())
+		Ω(bytes.Equal(l.Data, l2.Data)).To(BeTrue())
 
 		k2, err := NewPrivateKey()
 		Ω(err).To(BeNil())
-		ok, err = l3.Verify(k2.GetPublicKey())
+		ok, err = l.Verify(k2.GetPublicKey())
+		Ω(err).To(BeNil())
+		Ω(ok).To(BeFalse())
+	})
+
+	It("should test a license with b32", func() {
+
+		k, err := NewPrivateKey()
+		Ω(err).To(BeNil())
+
+		b := make([]byte, 100)
+		_, err = rand.Read(b)
+		Ω(err).To(BeNil())
+
+		l, err := NewLicense(k, b)
+		Ω(err).To(BeNil())
+		Ω(l).ToNot(BeNil())
+
+		b2, err := l.ToB32String()
+		Ω(err).To(BeNil())
+		l2, err := LicenseFromB32String(b2)
+		Ω(err).To(BeNil())
+		ok, err := l2.Verify(k.GetPublicKey())
+		Ω(err).To(BeNil())
+		Ω(ok).To(BeTrue())
+		Ω(bytes.Equal(l.Data, l2.Data)).To(BeTrue())
+
+		k2, err := NewPrivateKey()
+		Ω(err).To(BeNil())
+		ok, err = l.Verify(k2.GetPublicKey())
 		Ω(err).To(BeNil())
 		Ω(ok).To(BeFalse())
 	})

@@ -2,7 +2,7 @@ install:
   - go get github.com/onsi/ginkgo/ginkgo
   - go get github.com/onsi/gomega
 
-script: go test ./... -race
+script: go test -race
 
 language: go
 
