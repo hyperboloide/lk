@@ -22,18 +22,23 @@ var (
 	app = kingpin.New("lkgen", "A command-line utility to generate private keys and licenses to use with github.com/hyperboloide/lk library.")
 
 	// Gen a private key.
-	gen   = app.Command("gen", "Generates a base32 encoded private key.")
-	curve = gen.Flag("curve", "Elliptic curve to use.").
-		Short('c').
-		Default(cp384).
-		Enum(cp224, cp256, cp384, cp521)
-	gout = gen.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
+	gen      = app.Command("gen", "Generates a base32 encoded private key.")
+	genCurve = gen.Flag("curve", "Elliptic curve to use.").
+			Short('c').
+			Default(cp384).
+			Enum(cp224, cp256, cp384, cp521)
+	genOut = gen.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
+
+	// Pub returns the public key.
+	pub    = app.Command("pub", "Get the public key.")
+	pubKey = pub.Arg("key", "Path to private key to use.").String()
+	pubOut = pub.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
 
 	// Sign a new license
-	sign = app.Command("sign", "Creates a license.")
-	key  = sign.Arg("key", "Path to private key to use.").String()
-	sin  = sign.Flag("input", "Input data file (if not defined then stdin).").Short('i').String()
-	sout = sign.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
+	sign    = app.Command("sign", "Creates a license.")
+	signKey = sign.Arg("key", "Path to private key to use.").String()
+	signIn  = sign.Flag("input", "Input data file (if not defined then stdin).").Short('i').String()
+	signOut = sign.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
 )
 
 func main() {
@@ -41,14 +46,40 @@ func main() {
 	//Generate a private key
 	case gen.FullCommand():
 		genKey()
+	case pub.FullCommand():
+		publicKey()
 	// Sign a license
 	case sign.FullCommand():
 		signLicense()
 	}
 }
 
+func publicKey() {
+	b, err := ioutil.ReadFile(*pubKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pk, err := lk.PrivateKeyFromB32String(string(b[:]))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	key := pk.GetPublicKey()
+	str := key.ToB32String()
+
+	if *pubOut != "" {
+		if err := ioutil.WriteFile(*pubOut, []byte(str), 0600); err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		if _, err := os.Stdout.WriteString(str); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func signLicense() {
-	b, err := ioutil.ReadFile(*key)
+	b, err := ioutil.ReadFile(*signKey)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,8 +89,8 @@ func signLicense() {
 	}
 
 	var data []byte
-	if *sin != "" {
-		data, err = ioutil.ReadFile(*sin)
+	if *signIn != "" {
+		data, err = ioutil.ReadFile(*signIn)
 	} else {
 		data, err = ioutil.ReadAll(os.Stdin)
 	}
@@ -77,8 +108,8 @@ func signLicense() {
 		log.Fatal(err)
 	}
 
-	if *sout != "" {
-		if err := ioutil.WriteFile(*sout, []byte(str), 0600); err != nil {
+	if *signOut != "" {
+		if err := ioutil.WriteFile(*signOut, []byte(str), 0600); err != nil {
 			log.Fatal(err)
 		}
 	} else {
@@ -89,7 +120,7 @@ func signLicense() {
 }
 
 func genKey() {
-	switch *curve {
+	switch *genCurve {
 	case cp224:
 		lk.Curve = elliptic.P224
 	case cp256:
@@ -109,8 +140,8 @@ func genKey() {
 		log.Fatal(err)
 	}
 
-	if *gout != "" {
-		if err := ioutil.WriteFile(*gout, []byte(str), 0600); err != nil {
+	if *genOut != "" {
+		if err := ioutil.WriteFile(*genOut, []byte(str), 0600); err != nil {
 			log.Fatal(err)
 		}
 	} else {

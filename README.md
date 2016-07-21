@@ -92,7 +92,7 @@ Install it with the following command :
 go install github.com/hyperboloide/lk/lkgen
 ```
 
-See the usage bellow on how to use it:
+See the usage bellow on how to use it (or enter `lkgen --help-long`):
 
 ```
 usage: lkgen [<flags>] <command> [<args> ...]
@@ -110,7 +110,12 @@ Commands:
   gen [<flags>]
     Generates a base32 encoded private key.
 
-    -c, --curve=p384     Elliptic curve to use
+    -c, --curve=p384     Elliptic curve to use.
+    -o, --output=OUTPUT  Output file (if not defined then stdout).
+
+  pub [<flags>] [<key>]
+    Get the public key.
+
     -o, --output=OUTPUT  Output file (if not defined then stdout).
 
   sign [<flags>] [<key>]
