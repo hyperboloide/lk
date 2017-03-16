@@ -9,12 +9,13 @@ import (
 	"github.com/hyperboloide/lk"
 )
 
-// This example function creates a new license.
+// This example creates a new license and validate it.
 func ExampleLicense() {
 	// create a new Private key:
 	privateKey, err := lk.NewPrivateKey()
 	if err != nil {
 		log.Fatal(err)
+
 	}
 
 	// create a license document:
@@ -30,6 +31,7 @@ func ExampleLicense() {
 	docBytes, err := json.Marshal(doc)
 	if err != nil {
 		log.Fatal(err)
+
 	}
 
 	// generate your license with the private key:
@@ -43,6 +45,7 @@ func ExampleLicense() {
 	str64, err := license.ToB64String()
 	if err != nil {
 		log.Fatal(err)
+
 	}
 	fmt.Printf("License b64 encoded:\n%s\n", str64)
 

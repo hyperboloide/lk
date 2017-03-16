@@ -40,7 +40,7 @@ func (l *License) hash() ([]byte, error) {
 	return h256.Sum(nil), nil
 }
 
-// Verify the Lisence with the public key
+// Verify the License with the public key
 func (l *License) Verify(k *PublicKey) (bool, error) {
 	h, err := l.hash()
 	if err != nil {
