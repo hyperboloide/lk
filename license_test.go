@@ -3,49 +3,11 @@ package lk_test
 import (
 	"bytes"
 	"crypto/rand"
-	"encoding/json"
-	"fmt"
-	"log"
-	"time"
 
 	"github.com/hyperboloide/lk"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
-
-func ExampleNewLicense() {
-	// create a new Private key:
-	privKey, err := lk.NewPrivateKey()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// create a license document:
-	doc := struct {
-		Email string
-		End   time.Time
-	}{"test@example.com", time.Now().Add(time.Hour * 24 * 365)}
-
-	// marshall the document to bytes:
-	ulBytes, err := json.Marshal(doc)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// generate your license with the private key:
-	license, err := lk.NewLicense(privKey, ulBytes)
-	if err != nil {
-		log.Fatal(err)
-
-	}
-
-	// encode the new license to b64 and print it:
-	str64, err := license.ToB64String()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("License b64 encoded:\n%s\n\n", str64)
-}
 
 var _ = Describe("License", func() {
 
@@ -72,6 +34,13 @@ var _ = Describe("License", func() {
 		license, err = lk.NewLicense(privateKey, b)
 		Ω(err).To(BeNil())
 		Ω(license).ToNot(BeNil())
+		ok, err := license.Verify(privateKey.GetPublicKey())
+		Ω(err).To(BeNil())
+		Ω(ok).To(BeTrue())
+	})
+
+	It("should pass the example", func() {
+		ExampleLicense()
 	})
 
 	It("should test a license with bytes", func() {

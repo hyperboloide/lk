@@ -36,51 +36,59 @@ import (
 	"github.com/hyperboloide/lk"
 )
 
+// This example function creates a new license.
 func main() {
-
-	// Generates a Private key:
-	privKey, err := lk.NewPrivateKey()
+	// create a new Private key:
+	privateKey, err := lk.NewPrivateKey()
 	if err != nil {
 		log.Fatal(err)
 	}
-	str64, err := privKey.ToB64String()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Private Key b64 encoded:\n%s\n\n", str64)
 
-	// Get the public key:
-	pubKey := privKey.GetPublicKey()
-	fmt.Printf("Public Key b64 encoded:\n%s\n\n", pubKey.ToB64String())
-
-	// Generate a license:
-	userLicense := struct {
+	// create a license document:
+	doc := struct {
 		Email string
 		End   time.Time
-	}{"test@example.com", time.Now().Add(time.Hour * 24 * 365)}
-
-	ulBytes, err := json.Marshal(userLicense)
-	if err != nil {
-		log.Fatal(err)
+	}{
+		"test@example.com",
+		time.Now().Add(time.Hour * 24 * 365),
 	}
 
-	license, err := lk.NewLicense(privKey, ulBytes)
+	// marshall the document to bytes:
+	docBytes, err := json.Marshal(doc)
 	if err != nil {
 		log.Fatal(err)
 	}
-	str64, err = license.ToB64String()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("License b64 encoded:\n%s\n\n", str64)
 
-	// Verify the Lisence
-	ok, err := license.Verify(pubKey)
+	// generate your license with the private key:
+	license, err := lk.NewLicense(privateKey, docBytes)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+	// encode the new license to b64 and print it:
+	str64, err := license.ToB64String()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Is the license valid?\n%t\n", ok)
+	fmt.Printf("License b64 encoded:\n%s\n", str64)
+
+	// get the public key
+	publicKey := privateKey.GetPublicKey()
+
+	// validate the license:
+	if ok, err := license.Verify(publicKey); err != nil {
+		log.Fatal(err)
+
+	} else if ok {
+		fmt.Println("Valid license")
+
+	} else {
+		log.Fatal("Invalid license")
+
+	}
 }
+
 ```
 
 ### lkgen
