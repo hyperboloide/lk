@@ -1,12 +1,13 @@
 install:
+  - export PATH=$GOPATH/bin:$PATH
   - go get github.com/onsi/ginkgo/ginkgo
   - go get github.com/onsi/gomega
 
-script: go test -race
+script: ginkgo -r --randomizeSuites -race -cover
 
 language: go
 
 go:
-  - 1.5
-  - 1.6
+  - 1.7
+  - 1.8
   - tip

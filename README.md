@@ -97,7 +97,7 @@ See the usage bellow on how to use it (or enter `lkgen --help-long`):
 ```
 usage: lkgen [<flags>] <command> [<args> ...]
 
-A command-line utility to generate private keys and licenses to use with github.com/hyperboloide/lk library.
+A command-line utility to generate private keys and licenses.
 
 Flags:
   --help  Show context-sensitive help (also try --help-long and --help-man).
@@ -113,12 +113,12 @@ Commands:
     -c, --curve=p384     Elliptic curve to use.
     -o, --output=OUTPUT  Output file (if not defined then stdout).
 
-  pub [<flags>] [<key>]
+  pub [<flags>] <key>
     Get the public key.
 
     -o, --output=OUTPUT  Output file (if not defined then stdout).
 
-  sign [<flags>] [<key>]
+  sign [<flags>] <key>
     Creates a license.
 
     -i, --input=INPUT    Input data file (if not defined then stdin).

@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	app = kingpin.New("lkgen", "A command-line utility to generate private keys and licenses to use with github.com/hyperboloide/lk library.")
+	app = kingpin.New("lkgen", "A command-line utility to generate private keys and licenses.")
 
 	// Gen a private key.
 	gen      = app.Command("gen", "Generates a base32 encoded private key.")
@@ -31,12 +31,12 @@ var (
 
 	// Pub returns the public key.
 	pub    = app.Command("pub", "Get the public key.")
-	pubKey = pub.Arg("key", "Path to private key to use.").String()
+	pubKey = pub.Arg("key", "Path to private key to use.").Required().String()
 	pubOut = pub.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
 
 	// Sign a new license
 	sign    = app.Command("sign", "Creates a license.")
-	signKey = sign.Arg("key", "Path to private key to use.").String()
+	signKey = sign.Arg("key", "Path to private key to use.").Required().String()
 	signIn  = sign.Flag("input", "Input data file (if not defined then stdin).").Short('i').String()
 	signOut = sign.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
 )

@@ -1,4 +1,4 @@
-package lk
+package lk_test
 
 import (
 	. "github.com/onsi/ginkgo"

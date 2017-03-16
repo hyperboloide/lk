@@ -1,100 +1,119 @@
-package lk
+package lk_test
 
 import (
 	"bytes"
 	"crypto/rand"
+	"encoding/json"
+	"fmt"
+	"log"
+	"time"
 
+	"github.com/hyperboloide/lk"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
+func ExampleNewLicense() {
+	// create a new Private key:
+	privKey, err := lk.NewPrivateKey()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// create a license document:
+	doc := struct {
+		Email string
+		End   time.Time
+	}{"test@example.com", time.Now().Add(time.Hour * 24 * 365)}
+
+	// marshall the document to bytes:
+	ulBytes, err := json.Marshal(doc)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// generate your license with the private key:
+	license, err := lk.NewLicense(privKey, ulBytes)
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+	// encode the new license to b64 and print it:
+	str64, err := license.ToB64String()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("License b64 encoded:\n%s\n\n", str64)
+}
+
 var _ = Describe("License", func() {
 
-	It("should test a license with bytes", func() {
+	var privateKey *lk.PrivateKey
+	var wrongKey *lk.PrivateKey
+	var license *lk.License
+	var b []byte
 
-		k, err := NewPrivateKey()
+	BeforeEach(func() {
+		var err error
+
+		privateKey, err = lk.NewPrivateKey()
 		Ω(err).To(BeNil())
+		Ω(privateKey).ToNot(BeNil())
 
-		b := make([]byte, 100)
+		wrongKey, err = lk.NewPrivateKey()
+		Ω(err).To(BeNil())
+		Ω(privateKey).ToNot(BeNil())
+
+		b = make([]byte, 100)
 		_, err = rand.Read(b)
 		Ω(err).To(BeNil())
 
-		l, err := NewLicense(k, b)
+		license, err = lk.NewLicense(privateKey, b)
 		Ω(err).To(BeNil())
-		Ω(l).ToNot(BeNil())
+		Ω(license).ToNot(BeNil())
+	})
 
-		b2, err := l.ToBytes()
+	It("should test a license with bytes", func() {
+		b2, err := license.ToBytes()
 		Ω(err).To(BeNil())
-		l2, err := LicenseFromBytes(b2)
+		l2, err := lk.LicenseFromBytes(b2)
 		Ω(err).To(BeNil())
-		ok, err := l2.Verify(k.GetPublicKey())
+		ok, err := l2.Verify(privateKey.GetPublicKey())
 		Ω(err).To(BeNil())
 		Ω(ok).To(BeTrue())
-		Ω(bytes.Equal(l.Data, l2.Data)).To(BeTrue())
+		Ω(bytes.Equal(license.Data, l2.Data)).To(BeTrue())
 
-		k2, err := NewPrivateKey()
-		Ω(err).To(BeNil())
-		ok, err = l.Verify(k2.GetPublicKey())
+	})
+
+	It("should not validate with wrong key", func() {
+		ok, err := license.Verify(wrongKey.GetPublicKey())
 		Ω(err).To(BeNil())
 		Ω(ok).To(BeFalse())
 	})
 
 	It("should test a license with b64", func() {
-
-		k, err := NewPrivateKey()
+		b2, err := license.ToB64String()
 		Ω(err).To(BeNil())
-
-		b := make([]byte, 100)
-		_, err = rand.Read(b)
+		l2, err := lk.LicenseFromB64String(b2)
 		Ω(err).To(BeNil())
-
-		l, err := NewLicense(k, b)
-		Ω(err).To(BeNil())
-		Ω(l).ToNot(BeNil())
-
-		b2, err := l.ToB64String()
-		Ω(err).To(BeNil())
-		l2, err := LicenseFromB64String(b2)
-		Ω(err).To(BeNil())
-		ok, err := l2.Verify(k.GetPublicKey())
+		ok, err := l2.Verify(privateKey.GetPublicKey())
 		Ω(err).To(BeNil())
 		Ω(ok).To(BeTrue())
-		Ω(bytes.Equal(l.Data, l2.Data)).To(BeTrue())
+		Ω(bytes.Equal(license.Data, l2.Data)).To(BeTrue())
 
-		k2, err := NewPrivateKey()
-		Ω(err).To(BeNil())
-		ok, err = l.Verify(k2.GetPublicKey())
-		Ω(err).To(BeNil())
-		Ω(ok).To(BeFalse())
 	})
 
 	It("should test a license with b32", func() {
-
-		k, err := NewPrivateKey()
+		b2, err := license.ToB32String()
 		Ω(err).To(BeNil())
-
-		b := make([]byte, 100)
-		_, err = rand.Read(b)
+		l2, err := lk.LicenseFromB32String(b2)
 		Ω(err).To(BeNil())
-
-		l, err := NewLicense(k, b)
-		Ω(err).To(BeNil())
-		Ω(l).ToNot(BeNil())
-
-		b2, err := l.ToB32String()
-		Ω(err).To(BeNil())
-		l2, err := LicenseFromB32String(b2)
-		Ω(err).To(BeNil())
-		ok, err := l2.Verify(k.GetPublicKey())
+		ok, err := l2.Verify(privateKey.GetPublicKey())
 		Ω(err).To(BeNil())
 		Ω(ok).To(BeTrue())
-		Ω(bytes.Equal(l.Data, l2.Data)).To(BeTrue())
+		Ω(bytes.Equal(license.Data, l2.Data)).To(BeTrue())
 
-		k2, err := NewPrivateKey()
-		Ω(err).To(BeNil())
-		ok, err = l.Verify(k2.GetPublicKey())
-		Ω(err).To(BeNil())
-		Ω(ok).To(BeFalse())
 	})
 
 })

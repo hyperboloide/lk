@@ -24,3 +24,7 @@ _testmain.go
 *.prof
 /lkgen/lkgen
 /examples/gen_keys/gen_keys
+/lkgen/license.pub.key
+/lkgen/license.priv.key
+/lkgen/license.key
+/lk.coverprofile
