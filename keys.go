@@ -98,7 +98,7 @@ func PrivateKeyFromB64String(str string) (*PrivateKey, error) {
 	return PrivateKeyFromBytes(b)
 }
 
-// PrivateKeyFromB32String returns a private key from a base64 encoded
+// PrivateKeyFromB32String returns a private key from a base32 encoded
 // string.
 func PrivateKeyFromB32String(str string) (*PrivateKey, error) {
 	b, err := base32.StdEncoding.DecodeString(str)
