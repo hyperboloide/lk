@@ -148,7 +148,7 @@ func (k PublicKey) ToB32String() string {
 func PublicKeyFromBytes(b []byte) (*PublicKey, error) {
 	x, y := elliptic.Unmarshal(Curve(), b)
 	if x == nil {
-		return nil, errors.New("Invalid key.")
+		return nil, errors.New("invalid key")
 	}
 
 	k := ecdsa.PublicKey{

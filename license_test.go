@@ -40,9 +40,9 @@ var _ = Describe("License", func() {
 	})
 
 	It("should pass the example", func() {
-		ExampleComplete()
-		ExampleLicenseGeneration()
-		ExampleLicenseVerification()
+		Example_complete()
+		Example_licenseGeneration()
+		Example_licenseVerification()
 	})
 
 	It("should test a license with bytes", func() {
