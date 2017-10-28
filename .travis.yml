@@ -2,6 +2,7 @@ install:
   - export PATH=$GOPATH/bin:$PATH
   - go get github.com/onsi/ginkgo/ginkgo
   - go get github.com/onsi/gomega
+  - go get github.com/dchest/uniuri
 
 script: ginkgo -r --randomizeSuites -race -cover
 
