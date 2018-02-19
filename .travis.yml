@@ -9,6 +9,8 @@ script: ginkgo -r --randomizeSuites -race -cover
 language: go
 
 go:
+  - 1.7
   - 1.8
   - 1.9
+  - 1.10.x
   - tip
