@@ -28,3 +28,7 @@ _testmain.go
 /lkgen/license.priv.key
 /lkgen/license.key
 /lk.coverprofile
+
+# IDE files
+*.iml
+/.idea
