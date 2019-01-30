@@ -87,4 +87,16 @@ var _ = Describe("License", func() {
 
 	})
 
+	It("should test a license with hex", func() {
+		b2, err := license.ToHexString()
+		Ω(err).To(BeNil())
+		l2, err := lk.LicenseFromHexString(b2)
+		Ω(err).To(BeNil())
+		ok, err := l2.Verify(privateKey.GetPublicKey())
+		Ω(err).To(BeNil())
+		Ω(ok).To(BeTrue())
+		Ω(bytes.Equal(license.Data, l2.Data)).To(BeTrue())
+
+	})
+
 })
