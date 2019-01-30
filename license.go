@@ -50,19 +50,24 @@ func (l *License) Verify(k *PublicKey) (bool, error) {
 	return ecdsa.Verify(k.toEcdsa(), h, l.R, l.S), nil
 }
 
-// ToBytes transforms the public key to a base64 []byte.
+// ToBytes transforms the licence to a base64 []byte.
 func (l *License) ToBytes() ([]byte, error) {
 	return toBytes(l)
 }
 
-// ToB64String transforms the public key to a base64 []byte.
+// ToB64String transforms the licence to a base64 []byte.
 func (l *License) ToB64String() (string, error) {
 	return toB64String(l)
 }
 
-// ToB32String transforms the public key to a base64 []byte.
+// ToB32String transforms the license to a base32 []byte.
 func (l *License) ToB32String() (string, error) {
 	return toB32String(l)
+}
+
+// ToHexString transforms the license to a hexadecimal []byte.
+func (l *License) ToHexString() (string, error) {
+	return toHexString(l)
 }
 
 // LicenseFromBytes returns a License from a []byte.
@@ -83,4 +88,11 @@ func LicenseFromB64String(str string) (*License, error) {
 func LicenseFromB32String(str string) (*License, error) {
 	l := &License{}
 	return l, fromB32String(l, str)
+}
+
+// LicenseFromHexString returns a License from a hexadecimal encoded
+// string.
+func LicenseFromHexString(str string) (*License, error) {
+	l := &License{}
+	return l, fromHexString(l, str)
 }
