@@ -59,6 +59,19 @@ var _ = Describe("Keys", func() {
 		Ω(k2).To(BeNil())
 	})
 
+	It("should test private key hex", func() {
+		b, err := k.ToHexString()
+		Ω(err).To(BeNil())
+		k1, err := lk.PrivateKeyFromHexString(b)
+		Ω(err).To(BeNil())
+		Ω(k1).To(Equal(k))
+
+		invalidB32Str := uniuri.NewLen(42)
+		k2, err := lk.PrivateKeyFromHexString(invalidB32Str)
+		Ω(err).To(HaveOccurred())
+		Ω(k2).To(BeNil())
+	})
+
 	It("should test pubic key bytes", func() {
 		b := k.GetPublicKey().ToBytes()
 		k1, err := lk.PublicKeyFromBytes(b)
@@ -92,6 +105,18 @@ var _ = Describe("Keys", func() {
 
 		invalidB32Str := uniuri.NewLen(42)
 		k2, err := lk.PublicKeyFromB32String(invalidB32Str)
+		Ω(err).To(HaveOccurred())
+		Ω(k2).To(BeNil())
+	})
+
+	It("should test pubic key hex", func() {
+		b := k.GetPublicKey().ToHexString()
+		k1, err := lk.PublicKeyFromHexString(b)
+		Ω(err).To(BeNil())
+		Ω(k1).To(Equal(k.GetPublicKey()))
+
+		invalidHexStr := uniuri.NewLen(42)
+		k2, err := lk.PublicKeyFromHexString(invalidHexStr)
 		Ω(err).To(HaveOccurred())
 		Ω(k2).To(BeNil())
 	})
