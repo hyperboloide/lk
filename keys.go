@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/base32"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"math/big"
 )
@@ -61,13 +62,22 @@ func (k PrivateKey) ToB64String() (string, error) {
 	return base64.StdEncoding.EncodeToString(b), nil
 }
 
-// ToB32String transforms the private key to a base64 string.
+// ToB32String transforms the private key to a base32 string.
 func (k PrivateKey) ToB32String() (string, error) {
 	b, err := k.ToBytes()
 	if err != nil {
 		return "", err
 	}
 	return base32.StdEncoding.EncodeToString(b), nil
+}
+
+// ToHexString transforms the private key to a hexadecimal string
+func (k PrivateKey) ToHexString() (string, error) {
+	b, err := k.ToBytes()
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
 }
 
 // PrivateKeyFromBytes returns a private key from a []byte.
@@ -108,13 +118,23 @@ func PrivateKeyFromB32String(str string) (*PrivateKey, error) {
 	return PrivateKeyFromBytes(b)
 }
 
-// GetPublicKey returns the PublicKey associeted with the private key.
+// PrivateKeyFromHexString returns a private key from a hexadecimal encoded
+// string.
+func PrivateKeyFromHexString(str string) (*PrivateKey, error) {
+	b, err := hex.DecodeString(str)
+	if err != nil {
+		return nil, err
+	}
+	return PrivateKeyFromBytes(b)
+}
+
+// GetPublicKey returns the PublicKey associated with the private key.
 func (k PrivateKey) GetPublicKey() *PublicKey {
 	pk := PublicKey(k.PublicKey)
 	return &pk
 }
 
-// PublicKey is used to ckeck the validity of the licenses. You can share it
+// PublicKey is used to check the validity of the licenses. You can share it
 // freely.
 type PublicKey ecdsa.PublicKey
 
@@ -137,9 +157,16 @@ func (k PublicKey) ToB64String() string {
 	)
 }
 
-// ToB32String transforms the public key to a base64 string.
+// ToB32String transforms the public key to a base32 string.
 func (k PublicKey) ToB32String() string {
 	return base32.StdEncoding.EncodeToString(
+		k.ToBytes(),
+	)
+}
+
+// ToHexString transforms the public key to a hexadecimal string.
+func (k PublicKey) ToHexString() string {
+	return hex.EncodeToString(
 		k.ToBytes(),
 	)
 }
@@ -160,7 +187,7 @@ func PublicKeyFromBytes(b []byte) (*PublicKey, error) {
 	return &r, nil
 }
 
-// PublicKeyFromB64String returns a private key from a base64 encoded
+// PublicKeyFromB64String returns a public key from a base64 encoded
 // string.
 func PublicKeyFromB64String(str string) (*PublicKey, error) {
 	b, err := base64.StdEncoding.DecodeString(str)
@@ -171,10 +198,21 @@ func PublicKeyFromB64String(str string) (*PublicKey, error) {
 	return PublicKeyFromBytes(b)
 }
 
-// PublicKeyFromB32String returns a private key from a base64 encoded
+// PublicKeyFromB32String returns a public key from a base32 encoded
 // string.
 func PublicKeyFromB32String(str string) (*PublicKey, error) {
 	b, err := base32.StdEncoding.DecodeString(str)
+	if err != nil {
+		return nil, err
+	}
+
+	return PublicKeyFromBytes(b)
+}
+
+// PublicKeyFromHexString returns a public key from a hexadecimal encoded
+// string.
+func PublicKeyFromHexString(str string) (*PublicKey, error) {
+	b, err := hex.DecodeString(str)
 	if err != nil {
 		return nil, err
 	}
