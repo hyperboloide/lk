@@ -74,7 +74,7 @@ Below is an example of code that generates a license from a private key and a st
 // prefer reading it from a file, and that it should stay secret!
 const privateKeyBase32 = "FD7YCAYBAEFXA22DN5XHIYLJNZSXEAP7QIAACAQBANIHKYQBBIAACAKEAH7YIAAAAAFP7AYFAEBP7BQAAAAP7GP7QIAWCBCRKQVWKPT7UJDNP4LB5TXEQMO7EYEGDCE42KVBDNEGRIYIIJFBIWIVB6T6ZTKLSYSGK54DZ5VX6M5SJHBYZU2JXUFXJI25L2JJKJW4RL7UL2XBDT4GKYZ5IS6IWBCN7CWTMVBCBHJMH3RHZ5BVGVAY66MQAEYQEPSS2ANTYZIWXWSGIUJW3MDOO335JK3D4N3IV4L5UTAQMLS5YC7QASCAAUOHTZ5ZCCCYIBNCWBELBMAA===="
 
-// Here we use a struct that is marshalled to json, but ultimatly all you need is a []byte.
+// Here we use a struct that is marshalled to json, but ultimately all you need is a []byte.
 doc := struct {
 	Email string    `json:"email"`
 	End   time.Time `json:"end"`
@@ -152,7 +152,7 @@ if err := json.Unmarshal(license.Data, &result); err != nil {
 
 // Now you just have to check that the end date is after time.Now() then you can continue!
 if result.End.Before(time.Now()) {
-	log.Fatal("License expired on: %s", result.End.Format("2006-01-02"))
+	log.Fatalf("License expired on: %s", result.End.Format("2006-01-02"))
 } else {
 	fmt.Printf(`Licensed to %s until %s`, result.Email, result.End.Format("2006-01-02"))
 }
@@ -214,7 +214,7 @@ res := MyLicence{}
 if err := json.Unmarshal(license.Data, &res); err != nil {
 	log.Fatal(err)
 } else if res.End.Before(time.Now()) {
-	log.Fatal("License expired on: %s", res.End.String())
+	log.Fatalf("License expired on: %s", res.End.String())
 } else {
 	fmt.Printf(`Licensed to %s until %s \n`, res.Email, res.End.Format("2006-01-02"))
 }
