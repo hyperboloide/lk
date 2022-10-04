@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/hyperboloide/lk/actions/workflows/tests.yml/badge.svg)](https://github.com/hyperboloide/lk/actions/workflows/tests.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/hyperboloide/lk.svg)](https://pkg.go.dev/github.com/hyperboloide/lk)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hyperboloide/lk)](https://goreportcard.com/report/github.com/hyperboloide/lk)
 
 A simple licensing library in Golang, that generates license files
 containing arbitrary data.
