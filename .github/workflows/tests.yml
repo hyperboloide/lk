@@ -1,0 +1,44 @@
+name: Tests
+on: push
+
+jobs:
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.29
+          skip-cache: true
+          skip-build-cache: true
+
+  gosec:
+    name: security scanner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./...
+
+  tests:
+    name: Test suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
+      - uses: actions/checkout@v3
+      - name: Tests
+        run: go test -count=1 -timeout 240s -race -cover ./... 
+
+      - name: Build lkgen
+        run: cd lkgen && go build
