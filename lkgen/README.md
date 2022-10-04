@@ -11,10 +11,24 @@ go install github.com/hyperboloide/lk/lkgen
 
 ## Complete flow example:
 
-1. Generate a private key file: `lkgen gen --output=./private.key`
-2. Generate a public key to distribute with your app: `lkgen pub ./private.key --output=./pub.key`
-3. Create the licence (here we use json but can be anything...): `echo '{"email":"user@example.com", "until":"2023-10-04"}' > license.tmp`
-4. sign the license: `lkgen sign --input=./license.tmp --output=./license.signed private.key`. The file `license.signed` is your redistributable license.
+1. Generate a private key file: 
+```sh
+lkgen gen --output=./private.key
+```
+2. Generate a public key to distribute with your app: 
+```sh
+lkgen pub ./private.key --output=./pub.key
+```
+3. Create the licence (here we use json but can be anything...): 
+```sh
+echo '{"email":"user@example.com", "until":"2023-10-04"}' > license.tmp
+```
+4. sign the license: 
+```sh
+lkgen sign --input=./license.tmp --output=./license.signed private.key
+```
+The file `license.signed` is your redistributable license.
+
 5. validate the license:
 ```sh
 lkgen verify --input=./license.signed ./pub.key
