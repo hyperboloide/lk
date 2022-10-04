@@ -27,7 +27,8 @@ var _ = Describe("Keys", func() {
 		Ω(k1).To(Equal(k))
 
 		invalidBytes := make([]byte, 42)
-		rand.Read(invalidBytes)
+		_, err = rand.Read(invalidBytes)
+		Ω(err).To(BeNil())
 		k2, err := lk.PrivateKeyFromBytes(invalidBytes)
 		Ω(err).To(HaveOccurred())
 		Ω(k2).To(BeNil())
@@ -79,7 +80,8 @@ var _ = Describe("Keys", func() {
 		Ω(k1).To(Equal(k.GetPublicKey()))
 
 		invalidBytes := make([]byte, 42)
-		rand.Read(invalidBytes)
+		_, err = rand.Read(invalidBytes)
+		Ω(err).To(BeNil())
 		k2, err := lk.PublicKeyFromBytes(invalidBytes)
 		Ω(err).To(HaveOccurred())
 		Ω(k2).To(BeNil())

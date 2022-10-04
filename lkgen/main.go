@@ -2,12 +2,11 @@ package main
 
 import (
 	"crypto/elliptic"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
 	"github.com/hyperboloide/lk"
-
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -55,7 +54,7 @@ func main() {
 }
 
 func publicKey() {
-	b, err := ioutil.ReadFile(*pubKey)
+	b, err := os.ReadFile(*pubKey)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,7 +67,7 @@ func publicKey() {
 	str := key.ToB32String()
 
 	if *pubOut != "" {
-		if err := ioutil.WriteFile(*pubOut, []byte(str), 0600); err != nil {
+		if err := os.WriteFile(*pubOut, []byte(str), 0600); err != nil {
 			log.Fatal(err)
 		}
 	} else {
@@ -79,7 +78,7 @@ func publicKey() {
 }
 
 func signLicense() {
-	b, err := ioutil.ReadFile(*signKey)
+	b, err := os.ReadFile(*signKey)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,9 +89,9 @@ func signLicense() {
 
 	var data []byte
 	if *signIn != "" {
-		data, err = ioutil.ReadFile(*signIn)
+		data, err = os.ReadFile(*signIn)
 	} else {
-		data, err = ioutil.ReadAll(os.Stdin)
+		data, err = io.ReadAll(os.Stdin)
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -109,7 +108,7 @@ func signLicense() {
 	}
 
 	if *signOut != "" {
-		if err := ioutil.WriteFile(*signOut, []byte(str), 0600); err != nil {
+		if err := os.WriteFile(*signOut, []byte(str), 0600); err != nil {
 			log.Fatal(err)
 		}
 	} else {
@@ -141,7 +140,7 @@ func genKey() {
 	}
 
 	if *genOut != "" {
-		if err := ioutil.WriteFile(*genOut, []byte(str), 0600); err != nil {
+		if err := os.WriteFile(*genOut, []byte(str), 0600); err != nil {
 			log.Fatal(err)
 		}
 	} else {

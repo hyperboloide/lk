@@ -1,9 +1,6 @@
 # license-key
 
-[![Build Status](https://travis-ci.org/hyperboloide/lk.svg?branch=master)](https://travis-ci.org/hyperboloide/lk)
-[![GoDoc](https://godoc.org/github.com/hyperboloide/lk?status.svg)](https://godoc.org/github.com/hyperboloide/lk)
-[![Go Report Card](https://goreportcard.com/badge/github.com/hyperboloide/lk)](https://goreportcard.com/report/github.com/hyperboloide/lk)
-[![cover.run go](https://cover.run/go/github.com/hyperboloide/lk.svg)](https://cover.run/go/github.com/hyperboloide/lk)
+![tests](https://github.com/hyperboloide/lk/actions/workflows/tests/badge.svg)
 
 A simple licensing library in Golang, that generates license files
 containing arbitrary data.
@@ -18,8 +15,9 @@ and distribute them without too much hassle for the user.
 1. Generate a private key (and keep it secure).
 2. Transform the data you want to provide (end date, user email...) to a byte array (using json or gob for example).
 3. The library takes the data and create a cryptographically signed hash that is appended to the data.
-4. Convert the result to a Base 64 string and send it to the end user.
-5. when the user starts your program verify the signature using a public key.
+4. Convert the result to a Base64/Base32/Hex string and send it to the end user: this is the license.
+5. when the user starts your program load the license and verify the signature using a public key.
+6. validate the data in your license key (ex: the end date)
 
 ### lkgen
 
