@@ -1,6 +1,6 @@
 # license-key
 
-![tests](https://github.com/hyperboloide/lk/actions/workflows/tests/badge.svg)
+[![Tests](https://github.com/hyperboloide/lk/actions/workflows/tests.yml/badge.svg)](https://github.com/hyperboloide/lk/actions/workflows/tests.yml)
 
 A simple licensing library in Golang, that generates license files
 containing arbitrary data.
