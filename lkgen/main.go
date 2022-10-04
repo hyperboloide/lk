@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto/elliptic"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -10,22 +10,11 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const (
-	cp224 = "p224"
-	cp256 = "p256"
-	cp384 = "p384"
-	cp521 = "p521"
-)
-
 var (
 	app = kingpin.New("lkgen", "A command-line utility to generate private keys and licenses.")
 
 	// Gen a private key.
-	gen      = app.Command("gen", "Generates a base32 encoded private key.")
-	genCurve = gen.Flag("curve", "Elliptic curve to use.").
-			Short('c').
-			Default(cp384).
-			Enum(cp224, cp256, cp384, cp521)
+	gen    = app.Command("gen", "Generates a base32 encoded private key.")
 	genOut = gen.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
 
 	// Pub returns the public key.
@@ -38,18 +27,29 @@ var (
 	signKey = sign.Arg("key", "Path to private key to use.").Required().String()
 	signIn  = sign.Flag("input", "Input data file (if not defined then stdin).").Short('i').String()
 	signOut = sign.Flag("output", "Output file (if not defined then stdout).").Short('o').String()
+
+	// Verfify a license
+	verify       = app.Command("verify", "Verifies a license.")
+	verifyPubKey = verify.Arg("key", "Path to the public key to use.").Required().String()
+	verifyIn     = verify.Flag("input", "Input license file (if not defined then stdin).").Short('i').String()
 )
 
 func main() {
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+
 	//Generate a private key
 	case gen.FullCommand():
 		genKey()
+
 	case pub.FullCommand():
 		publicKey()
+
 	// Sign a license
 	case sign.FullCommand():
 		signLicense()
+
+	case verify.FullCommand():
+		verifyLicense()
 	}
 }
 
@@ -58,6 +58,7 @@ func publicKey() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	pk, err := lk.PrivateKeyFromB32String(string(b[:]))
 	if err != nil {
 		log.Fatal(err)
@@ -119,17 +120,6 @@ func signLicense() {
 }
 
 func genKey() {
-	switch *genCurve {
-	case cp224:
-		lk.Curve = elliptic.P224
-	case cp256:
-		lk.Curve = elliptic.P256
-	case cp521:
-		lk.Curve = elliptic.P521
-	default:
-		lk.Curve = elliptic.P384
-	}
-
 	key, err := lk.NewPrivateKey()
 	if err != nil {
 		log.Fatal(err)
@@ -148,4 +138,38 @@ func genKey() {
 			log.Fatal(err)
 		}
 	}
+}
+
+func verifyLicense() {
+	b, err := os.ReadFile(*verifyPubKey)
+	if err != nil {
+		log.Print(*verifyPubKey)
+		log.Fatal(err)
+	}
+
+	publicKey, err := lk.PublicKeyFromB32String(string(b))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if *verifyIn != "" {
+		b, err = os.ReadFile(*verifyIn)
+	} else {
+		b, err = io.ReadAll(os.Stdin)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	license, err := lk.LicenseFromB32String(string(b))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if ok, err := license.Verify(publicKey); err != nil {
+		log.Fatal(err)
+	} else if !ok {
+		log.Fatal("Invalid license signature")
+	}
+	fmt.Print(string(license.Data))
 }
