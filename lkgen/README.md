@@ -17,7 +17,7 @@ go install github.com/hyperboloide/lk/lkgen
 4. sign the license: `lkgen sign --input=./license.tmp --output=./license.signed private.key`. The file `license.signed` is your redistributable license.
 5. validate the license:
 ```sh
-$ lkgen verify --input=./license.signed ./pub.key
+lkgen verify --input=./license.signed ./pub.key
 {"email":"user@example.com", "until":"2023-10-04"}
 echo $?
 0
@@ -26,7 +26,7 @@ echo $?
 ## Reference documentation
 
 ```
-./lkgen --help-long
+lkgen --help-long
 usage: lkgen [<flags>] <command> [<args> ...]
 
 A command-line utility to generate private keys and licenses.
