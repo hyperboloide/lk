@@ -5,7 +5,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/hyperboloide/lk)](https://goreportcard.com/report/github.com/hyperboloide/lk)
 
 A simple licensing library in Golang, that generates license files
-containing arbitrary data.
+containing arbitrary data (ex: user email, end date...) that you can further validate if you want.
+The license file should be marshalled in an easy to distribute format (ex: base32)
 
 Note that this implementation is quite basic and that in no way it could
 prevent someone to hack your software. The goal of this project is only
@@ -74,7 +75,8 @@ Below is an example of code that generates a license from a private key and a st
 // prefer reading it from a file, and that it should stay secret!
 const privateKeyBase32 = "FD7YCAYBAEFXA22DN5XHIYLJNZSXEAP7QIAACAQBANIHKYQBBIAACAKEAH7YIAAAAAFP7AYFAEBP7BQAAAAP7GP7QIAWCBCRKQVWKPT7UJDNP4LB5TXEQMO7EYEGDCE42KVBDNEGRIYIIJFBIWIVB6T6ZTKLSYSGK54DZ5VX6M5SJHBYZU2JXUFXJI25L2JJKJW4RL7UL2XBDT4GKYZ5IS6IWBCN7CWTMVBCBHJMH3RHZ5BVGVAY66MQAEYQEPSS2ANTYZIWXWSGIUJW3MDOO335JK3D4N3IV4L5UTAQMLS5YC7QASCAAUOHTZ5ZCCCYIBNCWBELBMAA===="
 
-// Here we use a struct that is marshalled to json, but ultimately all you need is a []byte.
+// Define the data you need in your license,
+// here we use a struct that is marshalled to json, but ultimately all you need is a []byte.
 doc := struct {
 	Email string    `json:"email"`
 	End   time.Time `json:"end"`
