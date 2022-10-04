@@ -31,6 +31,8 @@ and distribute them without too much hassle for the user.
 
 A command line helper [lkgen](lkgen) is also provided to generate private keys and create licenses.
 
+This is also a good example of how to use the library.
+
 ### Examples
 
 #### Generating a new license:
