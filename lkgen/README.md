@@ -6,7 +6,7 @@ It can be used standalone to generate cypto keys, sign and validate license keys
 Install it with the following command :
 
 ```sh
-go install github.com/hyperboloide/lk/lkgen
+go install github.com/hyperboloide/lk/lkgen@latest
 ```
 
 ## Complete flow example:
