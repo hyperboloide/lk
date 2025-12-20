@@ -19,7 +19,7 @@ func Example_complete() {
 	// create a new Private key:
 	privateKey, err := lk.NewPrivateKey()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("private key generation failed: " + err.Error())
 
 	}
 
@@ -39,7 +39,7 @@ func Example_complete() {
 	// generate your license with the private key and the document:
 	license, err := lk.NewLicense(privateKey, docBytes)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("license generation failed: " + err.Error())
 
 	}
 
@@ -47,7 +47,6 @@ func Example_complete() {
 	str64, err := license.ToB64String()
 	if err != nil {
 		log.Fatal(err)
-
 	}
 	fmt.Println(str64)
 
@@ -57,7 +56,7 @@ func Example_complete() {
 
 	// validate the license:
 	if ok, err := license.Verify(publicKey); err != nil {
-		log.Fatal(err)
+		log.Fatal("license verification failed: " + err.Error())
 	} else if !ok {
 		log.Fatal("Invalid license signature")
 	}
@@ -101,22 +100,24 @@ func Example_licenseGeneration() {
 	// Unmarshal the private key:
 	privateKey, err := lk.PrivateKeyFromB32String(privateKeyBase32)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("private key unmarshal failed: " + err.Error())
 	}
 
 	// generate your license with the private key and the document:
 	license, err := lk.NewLicense(privateKey, docBytes)
 	if err != nil {
-		log.Fatal(err)
-
+		log.Fatal("license generation failed: " + err.Error())
 	}
+
 	// the b32 representation of our license, this is what you give to
 	// your customer.
 	licenseB32, err := license.ToB32String()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("license encoding failed: " + err.Error())
 
 	}
+
+	// print the license that you should give to your customer
 	fmt.Println(licenseB32)
 }
 
@@ -125,7 +126,7 @@ func Example_licenseGeneration() {
 func Example_licenseVerification() {
 
 	// A previously generated licence b32 encoded. In real life you should read
-	// it from a file at the beginning of your program and check it
+	// it from a file (or prompt the user) at the beginning of your program and check it
 	// before doing anything else...
 	const licenseB32 = "FT7YOAYBAEDUY2LDMVXHGZIB76EAAAIDAECEIYLUMEAQUAABAFJAD74EAAAQCUYB76CAAAAABL7YGBIBAL7YMAAAAD73H74IAFEHWITFNVQWS3BCHIRHIZLTORAGK6DBNVYGYZJOMNXW2IRMEJSW4ZBCHIRDEMBRHAWTCMBNGI3FIMJSHIYTSORTGMXDOMBZG43TIMJYHAVTAMR2GAYCE7IBGEBAPXB37ROJCUOYBVG4LAL3MSNKJKPGIKNT564PYK5X542NH62V7TAUEYHGLEOPZHRBAPH7M4SC55OHAEYQEXMKGG3JPO6BSHTDF3T5H6T42VUD7YAJ3TY5AP5MDE5QW4ZYWMSAPEK24HZOUXQ3LJ5YY34XYPVXBUAA===="
 
@@ -137,18 +138,18 @@ func Example_licenseVerification() {
 	// Unmarshal the public key
 	publicKey, err := lk.PublicKeyFromB32String(publicKeyBase32)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("public key unmarshal failed: " + err.Error())
 	}
 
 	// Unmarshal the customer license:
 	license, err := lk.LicenseFromB32String(licenseB32)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("license unmarshal failed: " + err.Error())
 	}
 
 	// validate the license signature:
 	if ok, err := license.Verify(publicKey); err != nil {
-		log.Fatal(err)
+		log.Fatal("license verification failed: " + err.Error())
 	} else if !ok {
 		log.Fatal("Invalid license signature")
 	}

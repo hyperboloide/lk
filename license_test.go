@@ -2,101 +2,104 @@ package lk_test
 
 import (
 	"bytes"
-	"crypto/rand"
 
 	"github.com/hyperboloide/lk"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("License", func() {
+func (s *Suite) TestExamples() {
+	s.Run("Example complete", Example_complete)
+	s.Run("Example license generation", Example_licenseGeneration)
+	s.Run("Example license verification", Example_licenseVerification)
+}
 
-	var privateKey *lk.PrivateKey
-	var wrongKey *lk.PrivateKey
-	var license *lk.License
-	var b []byte
+func (s *Suite) TestLicense() {
 
-	BeforeEach(func() {
+	var privateKey *lk.PrivateKey // private key for license generation
+	var wrongKey *lk.PrivateKey   // wrong key for verification
+	var license *lk.License       // license to be tested
+	var theData []byte            // data to be signed
+
+	s.Run("Generate test data", func() {
 		var err error
 
 		privateKey, err = lk.NewPrivateKey()
-		Ω(err).To(BeNil())
-		Ω(privateKey).ToNot(BeNil())
+		s.Require().NoError(err)
+		s.Require().NotNil(privateKey)
 
 		wrongKey, err = lk.NewPrivateKey()
-		Ω(err).To(BeNil())
-		Ω(privateKey).ToNot(BeNil())
+		s.Require().NoError(err)
+		s.Require().NotNil(wrongKey)
 
-		b = make([]byte, 100)
-		_, err = rand.Read(b)
-		Ω(err).To(BeNil())
+		theData = s.RandomBytes(100)
 
-		license, err = lk.NewLicense(privateKey, b)
-		Ω(err).To(BeNil())
-		Ω(license).ToNot(BeNil())
+		license, err = lk.NewLicense(privateKey, theData)
+		s.Require().NoError(err)
+		s.Require().NotNil(license)
+
 		ok, err := license.Verify(privateKey.GetPublicKey())
-		Ω(err).To(BeNil())
-		Ω(ok).To(BeTrue())
+		s.Require().NoError(err)
+		s.Require().True(ok)
 	})
 
-	It("should pass the example", func() {
-		Example_complete()
-		Example_licenseGeneration()
-		Example_licenseVerification()
-	})
-
-	It("should test a license with bytes", func() {
-		b2, err := license.ToBytes()
-		Ω(err).To(BeNil())
-		l2, err := lk.LicenseFromBytes(b2)
-		Ω(err).To(BeNil())
-		ok, err := l2.Verify(privateKey.GetPublicKey())
-		Ω(err).To(BeNil())
-		Ω(ok).To(BeTrue())
-		Ω(bytes.Equal(license.Data, l2.Data)).To(BeTrue())
-
-	})
-
-	It("should not validate with wrong key", func() {
+	s.Run("Should not validate with wrong key", func() {
 		ok, err := license.Verify(wrongKey.GetPublicKey())
-		Ω(err).To(BeNil())
-		Ω(ok).To(BeFalse())
+		s.Require().NoError(err)
+		s.Require().False(ok)
 	})
 
-	It("should test a license with b64", func() {
+	s.Run("Test license with bytes", func() {
+		b2, err := license.ToBytes()
+		s.Require().NoError(err)
+
+		l2, err := lk.LicenseFromBytes(b2)
+		s.Require().NoError(err)
+
+		ok, err := l2.Verify(privateKey.GetPublicKey())
+		s.Require().NoError(err)
+		s.Require().True(ok)
+
+		s.Require().True(bytes.Equal(license.Data, l2.Data))
+	})
+
+	s.Run("Test license with b64", func() {
 		b2, err := license.ToB64String()
-		Ω(err).To(BeNil())
+		s.Require().NoError(err)
+
 		l2, err := lk.LicenseFromB64String(b2)
-		Ω(err).To(BeNil())
-		ok, err := l2.Verify(privateKey.GetPublicKey())
-		Ω(err).To(BeNil())
-		Ω(ok).To(BeTrue())
-		Ω(bytes.Equal(license.Data, l2.Data)).To(BeTrue())
+		s.Require().NoError(err)
 
+		ok, err := l2.Verify(privateKey.GetPublicKey())
+		s.Require().NoError(err)
+		s.Require().True(ok)
+
+		s.Require().True(bytes.Equal(license.Data, l2.Data))
 	})
 
-	It("should test a license with b32", func() {
+	s.Run("should test a license with b32", func() {
 		b2, err := license.ToB32String()
-		Ω(err).To(BeNil())
+		s.Require().NoError(err)
+
 		l2, err := lk.LicenseFromB32String(b2)
-		Ω(err).To(BeNil())
-		ok, err := l2.Verify(privateKey.GetPublicKey())
-		Ω(err).To(BeNil())
-		Ω(ok).To(BeTrue())
-		Ω(bytes.Equal(license.Data, l2.Data)).To(BeTrue())
+		s.Require().NoError(err)
 
+		ok, err := l2.Verify(privateKey.GetPublicKey())
+		s.Require().NoError(err)
+		s.Require().True(ok)
+
+		s.Require().True(bytes.Equal(license.Data, l2.Data))
 	})
 
-	It("should test a license with hex", func() {
+	s.Run("should test a license with hex", func() {
 		b2, err := license.ToHexString()
-		Ω(err).To(BeNil())
+		s.Require().NoError(err)
+
 		l2, err := lk.LicenseFromHexString(b2)
-		Ω(err).To(BeNil())
+		s.Require().NoError(err)
+
 		ok, err := l2.Verify(privateKey.GetPublicKey())
-		Ω(err).To(BeNil())
-		Ω(ok).To(BeTrue())
-		Ω(bytes.Equal(license.Data, l2.Data)).To(BeTrue())
+		s.Require().NoError(err)
+		s.Require().True(ok)
 
+		s.Require().True(bytes.Equal(license.Data, l2.Data))
 	})
-
-})
+}
