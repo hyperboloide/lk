@@ -1,126 +1,110 @@
 package lk_test
 
 import (
-	"crypto/rand"
-
-	"github.com/dchest/uniuri"
 	"github.com/hyperboloide/lk"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Keys", func() {
+func (s *Suite) TestKeys() {
+	k, err := lk.NewPrivateKey()
+	s.Require().NoError(err)
 
-	var k *lk.PrivateKey
-
-	BeforeEach(func() {
-		var err error
-		k, err = lk.NewPrivateKey()
-		Ω(err).To(BeNil())
-	})
-
-	It("should test private key bytes", func() {
+	s.Run("should test private key bytes", func() {
 		b, err := k.ToBytes()
-		Ω(err).To(BeNil())
+		s.Require().NoError(err)
 		k1, err := lk.PrivateKeyFromBytes(b)
-		Ω(err).To(BeNil())
-		Ω(k1).To(Equal(k))
+		s.Require().NoError(err)
+		s.Require().Equal(k1, k)
 
-		invalidBytes := make([]byte, 42)
-		_, err = rand.Read(invalidBytes)
-		Ω(err).To(BeNil())
+		invalidBytes := s.RandomBytes(42)
 		k2, err := lk.PrivateKeyFromBytes(invalidBytes)
-		Ω(err).To(HaveOccurred())
-		Ω(k2).To(BeNil())
+		s.Require().Error(err)
+		s.Require().Nil(k2)
 	})
 
-	It("should test private key b64", func() {
-		b, err := k.ToB64String()
-		Ω(err).To(BeNil())
-		k1, err := lk.PrivateKeyFromB64String(b)
-		Ω(err).To(BeNil())
-		Ω(k1).To(Equal(k))
+	s.Run("should test private key bytes", func() {
+		b, err := k.ToBytes()
+		s.Require().NoError(err)
+		k1, err := lk.PrivateKeyFromBytes(b)
+		s.Require().NoError(err)
+		s.Require().Equal(k1, k)
 
-		invalidB64Str := uniuri.NewLen(42)
-		k2, err := lk.PrivateKeyFromB64String(invalidB64Str)
-		Ω(err).To(HaveOccurred())
-		Ω(k2).To(BeNil())
+		invalidBytes := s.RandomBytes(42)
+		k2, err := lk.PrivateKeyFromBytes(invalidBytes)
+		s.Require().Error(err)
+		s.Require().Nil(k2)
 	})
 
-	It("should test private key b32", func() {
-		b, err := k.ToB32String()
-		Ω(err).To(BeNil())
-		k1, err := lk.PrivateKeyFromB32String(b)
-		Ω(err).To(BeNil())
-		Ω(k1).To(Equal(k))
+	tc := []struct {
+		name               string
+		privateKeyToString func(k *lk.PrivateKey) (string, error)
+		publicKeyToString  func(k *lk.PublicKey) string
+		fromString         func(string) (*lk.PrivateKey, error)
+		fromPubStr         func(string) (*lk.PublicKey, error)
+		randomStr          func(int) string
+	}{
+		{
+			name: "b64",
+			privateKeyToString: func(k *lk.PrivateKey) (string, error) {
+				return k.ToB64String()
+			},
+			publicKeyToString: func(k *lk.PublicKey) string {
+				return k.ToB64String()
+			},
+			fromString: lk.PrivateKeyFromB64String,
+			fromPubStr: lk.PublicKeyFromB64String,
+			randomStr:  s.RandomB64String,
+		},
+		{
+			name: "b32",
+			privateKeyToString: func(k *lk.PrivateKey) (string, error) {
+				return k.ToB32String()
+			},
+			publicKeyToString: func(k *lk.PublicKey) string {
+				return k.ToB32String()
+			},
+			fromString: lk.PrivateKeyFromB32String,
+			fromPubStr: lk.PublicKeyFromB32String,
+			randomStr:  s.RandomB32String,
+		},
+		{
+			name: "hex",
+			privateKeyToString: func(k *lk.PrivateKey) (string, error) {
+				return k.ToHexString()
+			},
+			publicKeyToString: func(k *lk.PublicKey) string {
+				return k.ToHexString()
+			},
+			fromString: lk.PrivateKeyFromHexString,
+			fromPubStr: lk.PublicKeyFromHexString,
+			randomStr:  s.RandomHexString,
+		},
+	}
 
-		invalidB32Str := uniuri.NewLen(42)
-		k2, err := lk.PrivateKeyFromB32String(invalidB32Str)
-		Ω(err).To(HaveOccurred())
-		Ω(k2).To(BeNil())
-	})
+	for _, tc := range tc {
+		s.Run("should test private key "+tc.name, func() {
+			b, err := tc.privateKeyToString(k)
+			s.Require().NoError(err)
+			k1, err := tc.fromString(b)
+			s.Require().NoError(err)
+			s.Require().Equal(k1, k)
 
-	It("should test private key hex", func() {
-		b, err := k.ToHexString()
-		Ω(err).To(BeNil())
-		k1, err := lk.PrivateKeyFromHexString(b)
-		Ω(err).To(BeNil())
-		Ω(k1).To(Equal(k))
+			invalidStr := tc.randomStr(42)
+			k2, err := tc.fromString(invalidStr)
+			s.Require().Error(err)
+			s.Require().Nil(k2)
+		})
 
-		invalidB32Str := uniuri.NewLen(42)
-		k2, err := lk.PrivateKeyFromHexString(invalidB32Str)
-		Ω(err).To(HaveOccurred())
-		Ω(k2).To(BeNil())
-	})
+		s.Run("should test pubic key "+tc.name, func() {
+			b := tc.publicKeyToString(k.GetPublicKey())
+			k1, err := tc.fromPubStr(b)
+			s.Require().NoError(err)
+			s.Require().Equal(k1, k.GetPublicKey())
 
-	It("should test pubic key bytes", func() {
-		b := k.GetPublicKey().ToBytes()
-		k1, err := lk.PublicKeyFromBytes(b)
-		Ω(err).To(BeNil())
-		Ω(k1).To(Equal(k.GetPublicKey()))
+			invalidStr := s.RandomHexString(42)
+			k2, err := tc.fromPubStr(invalidStr)
+			s.Require().Error(err)
+			s.Require().Nil(k2)
+		})
+	}
 
-		invalidBytes := make([]byte, 42)
-		_, err = rand.Read(invalidBytes)
-		Ω(err).To(BeNil())
-		k2, err := lk.PublicKeyFromBytes(invalidBytes)
-		Ω(err).To(HaveOccurred())
-		Ω(k2).To(BeNil())
-	})
-
-	It("should test pubic key b64", func() {
-		b := k.GetPublicKey().ToB64String()
-		k1, err := lk.PublicKeyFromB64String(b)
-		Ω(err).To(BeNil())
-		Ω(k1).To(Equal(k.GetPublicKey()))
-
-		invalidB64Str := uniuri.NewLen(42)
-		k2, err := lk.PublicKeyFromB64String(invalidB64Str)
-		Ω(err).To(HaveOccurred())
-		Ω(k2).To(BeNil())
-	})
-
-	It("should test pubic key b32", func() {
-		b := k.GetPublicKey().ToB32String()
-		k1, err := lk.PublicKeyFromB32String(b)
-		Ω(err).To(BeNil())
-		Ω(k1).To(Equal(k.GetPublicKey()))
-
-		invalidB32Str := uniuri.NewLen(42)
-		k2, err := lk.PublicKeyFromB32String(invalidB32Str)
-		Ω(err).To(HaveOccurred())
-		Ω(k2).To(BeNil())
-	})
-
-	It("should test pubic key hex", func() {
-		b := k.GetPublicKey().ToHexString()
-		k1, err := lk.PublicKeyFromHexString(b)
-		Ω(err).To(BeNil())
-		Ω(k1).To(Equal(k.GetPublicKey()))
-
-		invalidHexStr := uniuri.NewLen(42)
-		k2, err := lk.PublicKeyFromHexString(invalidHexStr)
-		Ω(err).To(HaveOccurred())
-		Ω(k2).To(BeNil())
-	})
-
-})
+}

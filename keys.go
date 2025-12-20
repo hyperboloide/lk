@@ -7,7 +7,6 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/hex"
-	"errors"
 	"math/big"
 )
 
@@ -42,12 +41,13 @@ func (k *PrivateKey) toEcdsa() *ecdsa.PrivateKey {
 // ToBytes transforms the private key to a  []byte.
 func (k PrivateKey) ToBytes() ([]byte, error) {
 	ek := k.toEcdsa()
+	pubBytes, err := ek.PublicKey.Bytes()
+	if err != nil {
+		return nil, err
+	}
 	c := &pkContainer{
-		elliptic.Marshal(
-			ek.PublicKey.Curve,
-			ek.PublicKey.X,
-			ek.PublicKey.Y),
-		ek.D,
+		Pub: pubBytes,
+		D:   ek.D,
 	}
 
 	return toBytes(c)
@@ -145,9 +145,12 @@ func (k *PublicKey) toEcdsa() *ecdsa.PublicKey {
 
 // ToBytes transforms the public key to a []byte.
 func (k PublicKey) ToBytes() []byte {
-	// return toBytes(k)
-	ek := k.toEcdsa()
-	return elliptic.Marshal(ek.Curve, ek.X, ek.Y)
+	pkBytes, err := k.toEcdsa().Bytes()
+	if err != nil {
+		panic("lk: could not marshal public key: " + err.Error())
+	}
+
+	return pkBytes
 }
 
 // ToB64String transforms the public key to a base64 string.
@@ -173,17 +176,11 @@ func (k PublicKey) ToHexString() string {
 
 // PublicKeyFromBytes returns a public key from a []byte.
 func PublicKeyFromBytes(b []byte) (*PublicKey, error) {
-	x, y := elliptic.Unmarshal(Curve(), b)
-	if x == nil {
-		return nil, errors.New("invalid key")
+	k, err := ecdsa.ParseUncompressedPublicKey(Curve(), b)
+	if err != nil {
+		return nil, err
 	}
-
-	k := ecdsa.PublicKey{
-		Curve: Curve(),
-		X:     x,
-		Y:     y,
-	}
-	r := PublicKey(k)
+	r := PublicKey(*k)
 	return &r, nil
 }
 
